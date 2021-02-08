@@ -6,11 +6,11 @@ import { Button } from "../components/button";
 import { FormError } from "../components/form-error";
 import {
   CreateAccountMutation,
-  CreateAccountMutationVariables
+  CreateAccountMutationVariables,
 } from "../__type_graphql__/CreateAccountMutation";
 import { UserRole } from "../__type_graphql__/globalTypes";
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation CreateAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput) {
       ok
@@ -27,18 +27,22 @@ interface ICreateAccountFrom {
 }
 
 export const CreateAccount = () => {
-  const { register, handleSubmit, errors, getValues, formState } = useForm<
-    ICreateAccountFrom
-  >({
-    mode: "onBlur",
+  const {
+    register,
+    handleSubmit,
+    errors,
+    getValues,
+    formState,
+  } = useForm<ICreateAccountFrom>({
+    mode: "onChange",
     defaultValues: {
-      role: UserRole.Host
-    }
+      role: UserRole.Host,
+    },
   });
   const history = useHistory();
   const onCompleted = (data: CreateAccountMutation) => {
     const {
-      createAccount: { ok }
+      createAccount: { ok },
     } = data;
 
     if (ok) {
@@ -46,22 +50,26 @@ export const CreateAccount = () => {
       history.push("/");
     }
   };
-  const { email, password, role } = getValues();
   const [
     createAccountMutation,
-    { data: createAccountResult, loading }
+    { data: createAccountResult, loading },
   ] = useMutation<CreateAccountMutation, CreateAccountMutationVariables>(
     CREATE_ACCOUNT_MUTATION,
     {
-      variables: {
-        createAccountInput: { email, password, role }
-      },
-      onCompleted
+      onCompleted,
     }
   );
-  const _submit = () => {
-    if (!loading) createAccountMutation();
+  const onSubmit = () => {
+    if (!loading) {
+      const { email, password, role } = getValues();
+      createAccountMutation({
+        variables: {
+          createAccountInput: { email, password, role },
+        },
+      });
+    }
   };
+
   return (
     <div className="h-screen flex justify-center items-center bg-gray-50">
       <Helmet>
@@ -72,7 +80,7 @@ export const CreateAccount = () => {
           Create Account
         </h3>
         <form
-          onSubmit={handleSubmit(_submit)}
+          onSubmit={handleSubmit(onSubmit)}
           className="w-full flex flex-col px-6"
         >
           <div className="mb-2 flex align-center text-blue-400">
@@ -94,20 +102,18 @@ export const CreateAccount = () => {
           </div>
           <input
             ref={register({
-              required: {
-                value: true,
-                message: "Email is required!"
-              },
-              pattern: {
-                value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                message: "Email address invalid"
-              }
+              required: "Email is required!",
+              pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             })}
             className="border-b-2 border-blue-400 py-2 bg-transparent focus:outline-none w-full"
             name="email"
+            required
             type="email"
-            placeholder="E-mail"
+            placeholder="Email"
           ></input>
+          {errors.email?.type === "pattern" && (
+            <FormError errorMessage={"Please enter a valid email"} />
+          )}
           {errors.email?.message && (
             <FormError errorMessage={errors.email.message} />
           )}
@@ -131,33 +137,32 @@ export const CreateAccount = () => {
           </div>
           <input
             ref={register({
-              required: {
-                value: true,
-                message: "Password is required!"
-              },
-              minLength: {
-                value: 10,
-                message: "Password must be more than 10 characters"
-              }
+              minLength: 10,
+              required: "Password is required!",
             })}
             className="border-b-2 border-blue-400 py-2 bg-transparent focus:outline-none w-full"
             name="password"
             type="password"
+            required
             placeholder="Password"
           ></input>
+          {errors.password?.message && (
+            <FormError errorMessage={errors.password.message} />
+          )}
+          {errors.password?.type === "minLength" && (
+            <FormError errorMessage="Password must be more than 10 characters" />
+          )}
           <input
             ref={register({
               required: "Password is required!",
-              validate: (value) => value === getValues().password
+              validate: (value) => value === getValues().password,
             })}
             className="mt-4 border-b-2 border-blue-400 py-2 bg-transparent focus:outline-none w-full"
             name="confirm_password"
             type="password"
             placeholder="Confirm"
           ></input>
-          {errors.password?.message && (
-            <FormError errorMessage={errors.password.message} />
-          )}
+
           {errors.confirm_password && (
             <FormError errorMessage="Password not matched" />
           )}

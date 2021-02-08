@@ -8,10 +8,10 @@ import { FormError } from "../components/form-error";
 import { LS_TOKEN } from "../constants";
 import {
   LoginMutation,
-  LoginMutationVariables
+  LoginMutationVariables,
 } from "../__type_graphql__/LoginMutation";
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation LoginMutation($loginInput: LoginInput!) {
     login(input: $loginInput) {
       ok
@@ -27,15 +27,19 @@ interface ILoginForm {
 }
 
 export const Login = () => {
-  const { register, getValues, errors, handleSubmit, formState } = useForm<
-    ILoginForm
-  >({
-    mode: "onChange"
+  const {
+    register,
+    getValues,
+    errors,
+    handleSubmit,
+    formState,
+  } = useForm<ILoginForm>({
+    mode: "onChange",
   });
 
   const onCompleted = (data: LoginMutation) => {
     const {
-      login: { ok, token }
+      login: { ok, token },
     } = data;
 
     if (ok && token) {
@@ -44,19 +48,29 @@ export const Login = () => {
       isLoggedInVar(true);
     }
   };
-  const variables = {
-    loginInput: getValues()
-  };
+
   const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
     LoginMutation,
     LoginMutationVariables
   >(LOGIN_MUTATION, {
-    variables,
-    onCompleted
+    onCompleted,
   });
 
-  const _submit = () => {
-    if (!loading) loginMutation();
+  // const _submit = () => {
+  //   if (!loading) loginMutation();
+  // };
+  const onSubmit = () => {
+    if (!loading) {
+      const { email, password } = getValues();
+      loginMutation({
+        variables: {
+          loginInput: {
+            email,
+            password,
+          },
+        },
+      });
+    }
   };
 
   return (
@@ -82,7 +96,7 @@ export const Login = () => {
             Nuber-Podcasts
           </h3>
           <form
-            onSubmit={handleSubmit(_submit)}
+            onSubmit={handleSubmit(onSubmit)}
             className="w-full flex flex-col px-14"
           >
             <div className="border-b-2 border-blue-400 py-2 bg-transparent flex">
@@ -102,14 +116,19 @@ export const Login = () => {
               </svg>
               <input
                 ref={register({
-                  required: "Email is required!"
+                  required: "Email is required!",
+                  pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                 })}
                 className="focus:outline-none pl-2 w-full"
+                required
                 name="email"
                 type="email"
-                placeholder="E-mail"
-              ></input>
+                placeholder="Email"
+              />
             </div>
+            {errors.email?.type === "pattern" && (
+              <FormError errorMessage={"Please enter a valid email"} />
+            )}
             {errors.email?.message && (
               <FormError errorMessage={errors.email.message} />
             )}
@@ -131,7 +150,7 @@ export const Login = () => {
               <input
                 ref={register({
                   required: "Password is required!",
-                  minLength: 10
+                  minLength: 10,
                 })}
                 className="focus:outline-none pl-2 w-full"
                 name="password"

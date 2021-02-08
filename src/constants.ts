@@ -1,1 +1,1 @@
-export const LS_TOKEN = "nuber-potcasts-token";
+export const LS_TOKEN = "nuber-podcasts-token";
