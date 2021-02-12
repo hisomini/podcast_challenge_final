@@ -12,10 +12,24 @@ export enum UserRole {
   Listener = "Listener",
 }
 
+export interface CategoryInput {
+  name: string;
+}
+
 export interface CreateAccountInput {
   email?: string | null;
   password?: string | null;
   role?: UserRole | null;
+}
+
+export interface CreatePodcastInput {
+  title: string;
+  categoryName: string;
+}
+
+export interface EditProfileInput {
+  email?: string | null;
+  password?: string | null;
 }
 
 export interface LoginInput {
@@ -23,8 +37,27 @@ export interface LoginInput {
   password: string;
 }
 
+export interface MyPodcastInput {
+  id: number;
+}
+
 export interface PodcastSearchInput {
   id: number;
+}
+
+export interface SearchPodcastsInput {
+  page?: number | null;
+  titleQuery: string;
+}
+
+export interface UpdatePodcastInput {
+  id: number;
+  payload: UpdatePodcastPayload;
+}
+
+export interface UpdatePodcastPayload {
+  title?: string | null;
+  rating?: number | null;
 }
 
 //==============================================================

@@ -7,14 +7,17 @@
 // GraphQL query operation: getAllPodcastQuery
 // ====================================================
 
+export interface getAllPodcastQuery_getAllPodcasts_podcasts_category {
+  __typename: "Category";
+  name: string;
+}
+
 export interface getAllPodcastQuery_getAllPodcasts_podcasts {
   __typename: "Podcast";
   id: number;
   title: string;
-  category: string;
-  thumbnailUrl: string | null;
-  description: string | null;
-  rating: number;
+  category: getAllPodcastQuery_getAllPodcasts_podcasts_category | null;
+  createdAt: any;
 }
 
 export interface getAllPodcastQuery_getAllPodcasts {
@@ -24,6 +27,19 @@ export interface getAllPodcastQuery_getAllPodcasts {
   podcasts: getAllPodcastQuery_getAllPodcasts_podcasts[] | null;
 }
 
+export interface getAllPodcastQuery_allCategories_categories {
+  __typename: "Category";
+  name: string;
+}
+
+export interface getAllPodcastQuery_allCategories {
+  __typename: "AllCategoriesOutput";
+  error: string | null;
+  ok: boolean;
+  categories: getAllPodcastQuery_allCategories_categories[] | null;
+}
+
 export interface getAllPodcastQuery {
   getAllPodcasts: getAllPodcastQuery_getAllPodcasts;
+  allCategories: getAllPodcastQuery_allCategories;
 }

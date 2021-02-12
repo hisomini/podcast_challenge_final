@@ -5,7 +5,7 @@ import { PODCAST_FRAGMENT } from "../../fragments";
 import {
   getEpisodes,
   getEpisodesVariables,
-  getEpisodes_getPodcast_podcast
+  getEpisodes_getPodcast_podcast,
 } from "../../__type_graphql__/getEpisodes";
 
 const GET_EPISODES_QUERY = gql`
@@ -22,7 +22,9 @@ const GET_EPISODES_QUERY = gql`
       error
       episodes {
         title
-        description
+        category {
+          name
+        }
       }
     }
   }
@@ -40,9 +42,9 @@ export const Episodes = () => {
     {
       variables: {
         input: {
-          id: +params.id
-        }
-      }
+          id: +params.id,
+        },
+      },
     }
   );
 
@@ -55,38 +57,38 @@ export const Episodes = () => {
   }
 
   return (
-    <div className="w-full px-5 xl:px-0 mx-auto max-w-screen-xl">
+    <div className="w-full px-5 xl:px-0 mx-auto max-w-screen-xl ">
       <Helmet>
         <title>Episode List | Nuber-podcasts</title>
       </Helmet>
       <div className="flex justify-center my-8">
-        <div className="flex flex-col justify-center px-3 md:px-12 w-3/4">
-          <h1 className="text-blue-400 font-semibold text-3xl">
+        <div className="flex flex-col justify-center px-3 md:px-12 w-3/4 border-2 border-indigo-200 p-4">
+          <h1 className="text-blue-500 font-semibold text-3xl">
             {data?.getPodcast.podcast?.title}
           </h1>
-          <h2 className="py-3 text-md font-light">
-            {data?.getPodcast.podcast?.description}
+          <h2 className="py-3 text-gray-500 text-xl font-light">
+            {data?.getPodcast.podcast?.category?.name}
           </h2>
           <Link
             to="/"
-            className="border-2 border-blue-400 rounded-full px-4 w-28 text-blue-400 font-semibold hover:bg-blue-400 hover:text-gray-50 transition-colors"
+            className="border-2 border-indigo-300 rounded-full px-5 py-2 w-32 text-indigo-400 font-semibold hover:bg-blue-300 hover:text-gray-50 transition-colors"
           >
             ↵ Go Back
           </Link>
         </div>
-        <div
-          style={{
-            backgroundImage: `url(${data?.getPodcast.podcast?.thumbnailUrl})`
-          }}
+        {/* <div
+          // style={{
+          //   backgroundImage: `url(${data?.getPodcast.podcast?.thumbnailUrl})`,
+          // }}
           className="bg-cover w-32 h-32 md:w-48 md:h-48 rounded-md"
-        ></div>
+        ></div> */}
       </div>
       <div className="grid grid-cols-1 gap-3">
         {data?.getEpisodes.episodes?.map((episode) => (
-          <div className="w-full border-2 border-blue-400 rounded-lg px-4 md:px-16 py-3 flex justify-between items-center">
+          <div className="w-full border-2 border-indigo-400 rounded-lg px-4 md:px-16 py-3 flex justify-between items-center">
             <div className="mr-2 md:mr-8">
               <h2 className="font-semibold font-lg">{episode.title}</h2>
-              <h3 className="font-md"> - {episode.description}</h3>
+              <h3 className="font-md font-bold"> - {episode.category?.name}</h3>
             </div>
             <div>
               <svg

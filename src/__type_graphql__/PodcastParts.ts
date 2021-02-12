@@ -7,12 +7,15 @@
 // GraphQL fragment: PodcastParts
 // ====================================================
 
+export interface PodcastParts_category {
+  __typename: "Category";
+  name: string;
+}
+
 export interface PodcastParts {
   __typename: "Podcast";
   id: number;
   title: string;
-  category: string;
-  thumbnailUrl: string | null;
-  description: string | null;
-  rating: number;
+  category: PodcastParts_category | null;
+  createdAt: any;
 }
